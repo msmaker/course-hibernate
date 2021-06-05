@@ -1,5 +1,7 @@
 package com.msmaker.hibernate.demo;
 
+import java.util.List;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -18,16 +20,35 @@ public class CreateStudentDemo {
 		Session session = factory.getCurrentSession();
 
 		try {
-			// create a student object
-			System.out.println("Creating new student object");
-			Student tempStudent = new Student("Marco", "Silva", "marco@gmail.com");
 
 			// start a transaction
 			session.beginTransaction();
 
-			// save the student object
-			System.out.println("Saving the student");
-			session.save(tempStudent);
+			// query students
+			List<Student> theStudents = session.createQuery("from Student").getResultList();
+
+			// display the students
+			displayStudents(theStudents);
+
+			// query students: lastName = 'Silva'
+			theStudents = session.createQuery("from Student s where s.lastName='Silva'").getResultList();
+
+			// display the students
+			System.out.println("\n\nStudents who have last name of Silva");
+			displayStudents(theStudents);
+
+			// query students: lastName= 'Silva' OR firstName = 'Pato'
+			theStudents = session.createQuery("from Student s where s.lastName = 'Silva' OR firstName ='Pato'")
+					.getResultList();
+
+			System.out.println("\n\nStudents who have last name of Silva or first name Pato");
+			displayStudents(theStudents);
+
+			// query students where email LIKE '%gmail.com'
+			theStudents = session.createQuery("from Student s where s.email LIKE '%gmail.com'").getResultList();
+
+			System.out.println("\n\nStudents who have email ends with gmail.com");
+			displayStudents(theStudents);
 
 			// commit transaction
 			session.getTransaction().commit();
@@ -37,6 +58,12 @@ public class CreateStudentDemo {
 		} finally {
 			factory.close();
 
+		}
+	}
+
+	private static void displayStudents(List<Student> theStudents) {
+		for (Student tempStudent : theStudents) {
+			System.out.println(tempStudent);
 		}
 	}
 }
